@@ -54,6 +54,24 @@ KIND_CONFIG ?= kind-$(KUBE_VERSION).yaml
 
 OPERATOR_SDK_VERSION ?= 1.23.0
 
+SCORECARD_KUTTL_TESTS := \
+	ingress \
+	instrumentation-dotnet \
+	instrumentation-dotnet-multicontainer \
+	instrumentation-java \
+	instrumentation-java-multicontainer \
+	instrumentation-java-other-ns \
+	instrumentation-nodejs-multicontainer \
+	instrumentation-python \
+	instrumentation-python-multicontainer \
+	smoke-pod-annotations \
+	smoke-restarting-deployment \
+	smoke-sidecar \
+	smoke-sidecar-other-namespace \
+	smoke-simplest \
+	smoke-statefulset \
+	statefulset-features \
+
 CERTMANAGER_VERSION ?= 1.10.0
 
 ifndef ignore-not-found
@@ -176,8 +194,9 @@ prepare-e2e: kuttl set-test-image-vars set-image-controller container container-
 	$(KUSTOMIZE) build config/crd -o tests/_build/crds/
 
 .PHONY: scorecard-tests
-scorecard-tests: operator-sdk
-	$(OPERATOR_SDK) scorecard -w=5m bundle || (echo "scorecard test failed" && exit 1)
+scorecard-tests: operator-sdk bundle-scorecard-kuttl-tests
+	kubectl apply -f tests/scorecard/rbac.yaml
+	$(OPERATOR_SDK) scorecard -w=15m bundle || (echo "scorecard test failed" && exit 1)
 
 .PHONY: set-test-image-vars
 set-test-image-vars:
@@ -337,6 +356,11 @@ bundle: kustomize operator-sdk manifests set-image-controller
 	$(OPERATOR_SDK) generate kustomize manifests -q
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
 	$(OPERATOR_SDK) bundle validate ./bundle
+
+# Copy selected e2e tests to the kuttl scorecard tests of the bundle
+.PHONY: bundle-scorecard-kuttl-tests
+bundle-scorecard-kuttl-tests:
+	for t in $(SCORECARD_KUTTL_TESTS); do cp -r tests/e2e/$$t bundle/tests/scorecard/kuttl; done
 
 # Build the bundle image, used only for local dev purposes
 .PHONY: bundle-build

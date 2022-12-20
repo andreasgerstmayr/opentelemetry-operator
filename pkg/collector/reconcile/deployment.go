@@ -35,6 +35,7 @@ import (
 // Deployments reconciles the deployment(s) required for the instance in the current context.
 func Deployments(ctx context.Context, params Params) error {
 	desired := []appsv1.Deployment{}
+	params.Log.Info("reconcile deployments", "mode", params.Instance.Spec.Mode)
 	if params.Instance.Spec.Mode == "deployment" {
 		desired = append(desired, collector.Deployment(params.Config, params.Log, params.Instance))
 	}
