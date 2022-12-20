@@ -186,6 +186,7 @@ func NewReconciler(p Params) *OpenTelemetryCollectorReconciler {
 // Reconcile the current state of an OpenTelemetry collector resource with the desired state.
 func (r *OpenTelemetryCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.log.WithValues("opentelemetrycollector", req.NamespacedName)
+	log.Info("reconcile start", "req", req)
 
 	var instance v1alpha1.OpenTelemetryCollector
 	if err := r.Get(ctx, req.NamespacedName, &instance); err != nil {
