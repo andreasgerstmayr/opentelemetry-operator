@@ -38,4 +38,4 @@ jobs:
         run:  kubectl wait --timeout=5m --for=condition=available deployment/coredns -n kube-system
 
       - name: "run scorecard test"
-        run: make scorecard-tests
+        run: make prepare-scorecard-tests scorecard-tests

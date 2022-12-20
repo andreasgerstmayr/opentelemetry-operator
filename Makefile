@@ -176,9 +176,14 @@ prepare-e2e: kuttl set-test-image-vars set-image-controller container container-
 	$(KUSTOMIZE) build config/default -o tests/_build/manifests/01-opentelemetry-operator.yaml
 	$(KUSTOMIZE) build config/crd -o tests/_build/crds/
 
+.PHONY: prepare-scorecard-tests
+prepare-scorecard-tests: prepare-e2e cert-manager
+	kubectl apply -f tests/_build/manifests/01-opentelemetry-operator.yaml
+	kubectl apply -f tests/scorecard/rbac.yaml
+
 .PHONY: scorecard-tests
 scorecard-tests: operator-sdk
-	$(OPERATOR_SDK) scorecard -w=5m bundle || (echo "scorecard test failed" && exit 1)
+	$(OPERATOR_SDK) scorecard --wait-time=5m --service-account=scorecard-admin bundle || (echo "scorecard test failed" && exit 1)
 
 .PHONY: set-test-image-vars
 set-test-image-vars:
