@@ -2,6 +2,7 @@ apiVersion: scorecard.operatorframework.io/v1alpha3
 kind: Configuration
 metadata:
   name: config
+serviceaccount: scorecard-admin
 stages:
 - parallel: true
   tests:
@@ -42,6 +43,33 @@ stages:
     labels:
       suite: olm
       test: olm-crds-have-resources-test
+    storage:
+      spec:
+        mountPath: {}
+  - entrypoint:
+    - entrypoint
+    - --namespace-per-test
+    - --troubleshooting-script
+    - |
+      echo === List all pods
+      kubectl get -A pod
+      echo
+
+      echo === Describe opentelemetry-operator-controller-manager deployment
+      kubectl describe -A deployment -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
+      echo
+
+      echo === Describe opentelemetry-operator-controller-manager pod
+      kubectl describe -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
+      echo
+
+      echo === Logs of opentelemetry-operator-controller-manager pod
+      kubectl logs deployment/opentelemetry-operator-controller-manager manager --namespace `kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.namespace}'`
+      echo
+    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678812029
+    labels:
+      suite: kuttlsuite
+      test: kuttltest1
     storage:
       spec:
         mountPath: {}

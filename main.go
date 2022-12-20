@@ -319,4 +319,5 @@ func tlsConfigSetting(cfg *tls.Config, tlsOpt tlsConfig) {
 		setupLog.Error(err, "Failed to convert TLS cipher suite name to ID")
 	}
 	cfg.CipherSuites = cipherSuiteIDs
+	fmt.Printf("setting TLS version %v and suites %#v\n", cfg.MinVersion, cfg.CipherSuites)
 }
