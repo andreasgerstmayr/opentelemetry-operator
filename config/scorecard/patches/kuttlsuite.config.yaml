@@ -1,7 +1,10 @@
 - op: add
   path: /stages/0/tests/-
   value:
-    image: quay.io/operator-framework/scorecard-test-kuttl:v2.0.0
+    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1676552636
+    entrypoint:
+    - entrypoint
+    - --namespace-per-test
     labels:
       suite: kuttlsuite
       test: kuttltest1

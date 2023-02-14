@@ -59,6 +59,8 @@ START_KIND_CLUSTER ?= true
 KUBE_VERSION ?= 1.24
 KIND_CONFIG ?= kind-$(KUBE_VERSION).yaml
 
+SCORECARD_KUTTL_TESTS := $(filter-out autoscale,$(shell ls tests/e2e))
+
 OPERATOR_SDK_VERSION ?= 1.23.0
 
 CERTMANAGER_VERSION ?= 1.10.0
@@ -185,7 +187,7 @@ prepare-e2e: kuttl set-image-controller container container-target-allocator con
 	TARGETALLOCATOR_IMG=$(TARGETALLOCATOR_IMG) ./hack/modify-test-images.sh
 
 .PHONY: scorecard-tests
-scorecard-tests: operator-sdk
+scorecard-tests: operator-sdk bundle-scorecard-kuttl-tests
 	kubectl apply -f tests/scorecard/rbac.yaml
 	$(OPERATOR_SDK) scorecard -w=5m bundle || (echo "scorecard test failed" && exit 1)
 
@@ -372,6 +374,11 @@ bundle: kustomize operator-sdk manifests set-image-controller
 	$(OPERATOR_SDK) generate kustomize manifests -q
 	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
 	$(OPERATOR_SDK) bundle validate ./bundle
+
+# Copy selected e2e tests to the kuttl scorecard tests of the bundle
+.PHONY: bundle-scorecard-kuttl-tests
+bundle-scorecard-kuttl-tests:
+	for t in $(SCORECARD_KUTTL_TESTS); do cp -r tests/e2e/$$t bundle/tests/scorecard/kuttl; done
 
 # Build the bundle image, used only for local dev purposes
 .PHONY: bundle-build

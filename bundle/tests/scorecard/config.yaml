@@ -46,7 +46,10 @@ stages:
     storage:
       spec:
         mountPath: {}
-  - image: quay.io/operator-framework/scorecard-test-kuttl:v2.0.0
+  - entrypoint:
+    - entrypoint
+    - --namespace-per-test
+    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1676552636
     labels:
       suite: kuttlsuite
       test: kuttltest1
