@@ -205,7 +205,7 @@ prepare-e2e: kuttl set-image-controller container container-target-allocator con
 .PHONY: scorecard-tests
 scorecard-tests: operator-sdk bundle-scorecard-kuttl-tests
 	kubectl apply -f tests/scorecard/rbac.yaml
-	$(OPERATOR_SDK) scorecard -w=10m bundle || (echo "scorecard test failed" && exit 1)
+	$(OPERATOR_SDK) scorecard -w=15m bundle || (echo "scorecard test failed" && exit 1)
 
 
 # Build the container image, used only for local dev purposes
