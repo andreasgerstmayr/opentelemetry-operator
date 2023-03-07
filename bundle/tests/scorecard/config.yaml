@@ -49,7 +49,9 @@ stages:
   - entrypoint:
     - entrypoint
     - --namespace-per-test
-    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1677079022
+    - --troubleshooting-cmd
+    - kubectl get -A pod
+    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678207863
     labels:
       suite: kuttlsuite
       test: kuttltest1

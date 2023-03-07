@@ -1,10 +1,12 @@
 - op: add
   path: /stages/0/tests/-
   value:
-    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1677079022
+    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678207863
     entrypoint:
     - entrypoint
     - --namespace-per-test
+    - --troubleshooting-cmd
+    - "kubectl get -A pod"
     labels:
       suite: kuttlsuite
       test: kuttltest1
