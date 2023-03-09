@@ -49,11 +49,27 @@ stages:
   - entrypoint:
     - entrypoint
     - --namespace-per-test
-    - --troubleshooting-cmd
-    - kubectl get -A pod && kubectl logs deployment/opentelemetry-operator-controller-manager
-      manager -n `kubectl get -A pod -lapp.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
-      -o=jsonpath='{.items[0].metadata.namespace}'`
-    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678207863
+    - --troubleshooting-script
+    - |
+      echo === List all pods
+      kubectl get -A pod
+      echo
+
+      echo === Describe opentelemetry-operator-controller-manager deployment
+      kubectl describe -A deployment -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
+      echo
+
+      echo === Describe opentelemetry-operator-controller-manager pod
+      kubectl describe -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
+      echo
+
+      echo === Logs of opentelemetry-operator-controller-manager pod
+      kubectl logs deployment/opentelemetry-operator-controller-manager manager --namespace `kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.namespace}'`
+      echo
+
+      echo === Events
+      kubectl get -A event
+    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678375221
     labels:
       suite: kuttlsuite
       test: kuttltest1
