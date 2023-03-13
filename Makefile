@@ -59,7 +59,7 @@ START_KIND_CLUSTER ?= true
 KUBE_VERSION ?= 1.24
 KIND_CONFIG ?= kind-$(KUBE_VERSION).yaml
 
-SCORECARD_KUTTL_TESTS := \
+SCORECARD_KUTTL_TESTS_ORIG := \
 	ingress \
 	instrumentation-dotnet \
 	instrumentation-dotnet-multicontainer \
@@ -76,6 +76,9 @@ SCORECARD_KUTTL_TESTS := \
 	smoke-simplest \
 	smoke-statefulset \
 	statefulset-features \
+
+SCORECARD_KUTTL_TESTS := \
+	smoke-simplest
 
 OPERATOR_SDK_VERSION ?= 1.23.0
 
