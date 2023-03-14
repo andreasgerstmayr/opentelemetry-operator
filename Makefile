@@ -78,7 +78,7 @@ SCORECARD_KUTTL_TESTS_ORIG := \
 	statefulset-features \
 
 SCORECARD_KUTTL_TESTS := \
-	smoke-simplest
+	smoketest \
 
 OPERATOR_SDK_VERSION ?= 1.23.0
 

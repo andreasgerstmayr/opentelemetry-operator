@@ -66,9 +66,6 @@ stages:
       echo === Logs of opentelemetry-operator-controller-manager pod
       kubectl logs deployment/opentelemetry-operator-controller-manager manager --namespace `kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.namespace}'`
       echo
-
-      echo === Events
-      kubectl get -A event
     image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678375221
     labels:
       suite: kuttlsuite
