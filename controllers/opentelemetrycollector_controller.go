@@ -186,12 +186,15 @@ func NewReconciler(p Params) *OpenTelemetryCollectorReconciler {
 // Reconcile the current state of an OpenTelemetry collector resource with the desired state.
 func (r *OpenTelemetryCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.log.WithValues("opentelemetrycollector", req.NamespacedName)
+	log.Info("reconcile start", "req", req)
 
 	var instance v1alpha1.OpenTelemetryCollector
 	if err := r.Get(ctx, req.NamespacedName, &instance); err != nil {
 		if !apierrors.IsNotFound(err) {
 			log.Error(err, "unable to fetch OpenTelemetryCollector")
 		}
+
+		log.Error(err, "reconcile get error", "req", req)
 
 		// we'll ignore not-found errors, since they can't be fixed by an immediate
 		// requeue (we'll need to wait for a new notification), and we can get them
@@ -209,17 +212,24 @@ func (r *OpenTelemetryCollectorReconciler) Reconcile(ctx context.Context, req ct
 	}
 
 	if err := r.RunTasks(ctx, params); err != nil {
+		log.Error(err, "reconcile completed with errors")
 		return ctrl.Result{}, err
 	}
+
+	log.Info("reconcile completed")
 
 	return ctrl.Result{}, nil
 }
 
 // RunTasks runs all the tasks associated with this reconciler.
 func (r *OpenTelemetryCollectorReconciler) RunTasks(ctx context.Context, params reconcile.Params) error {
+	r.log.Info("RunTasks RLock()", "named", params.Instance.Name)
 	r.muTasks.RLock()
+	r.log.Info("RunTasks RLock() acquired", "named", params.Instance.Name)
 	defer r.muTasks.RUnlock()
+	r.log.Info("RunTasks tasks start", "named", params.Instance.Name)
 	for _, task := range r.tasks {
+		r.log.Info("RunTasks task start", "task.Name", task.Name)
 		if err := task.Do(ctx, params); err != nil {
 			// If we get an error that occurs because a pod is being terminated, then exit this loop
 			if apierrors.IsForbidden(err) && apierrors.HasStatusCause(err, corev1.NamespaceTerminatingCause) {
@@ -231,6 +241,7 @@ func (r *OpenTelemetryCollectorReconciler) RunTasks(ctx context.Context, params 
 				return err
 			}
 		}
+		r.log.Info("RunTasks task complete", "task.Name", task.Name)
 	}
 
 	return nil

@@ -7,21 +7,17 @@
     - --namespace-per-test
     - --troubleshooting-script
     - |
-      echo === List all pods
-      kubectl get -A pod
-      echo
+      namespace=`kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.namespace}'`
+      pod=`kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}'`
 
-      echo === Describe opentelemetry-operator-controller-manager deployment
-      kubectl describe -A deployment -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
-      echo
+      kubectl logs deployment/opentelemetry-operator-controller-manager manager --namespace $namespace
+      date
+      kubectl get event --namespace $namespace -o custom-columns=FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Object:.involvedObject.name,Type:.type,Reason:.reason,Message:.message
 
-      echo === Describe opentelemetry-operator-controller-manager pod
       kubectl describe -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
-      echo
-
-      echo === Logs of opentelemetry-operator-controller-manager pod
-      kubectl logs deployment/opentelemetry-operator-controller-manager manager --namespace `kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.namespace}'`
-      echo
+      kubectl describe -A deployment -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
+      kubectl get -A pod
+      date
     labels:
       suite: kuttlsuite
       test: kuttltest1
