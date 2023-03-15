@@ -223,7 +223,7 @@ func (r *OpenTelemetryCollectorReconciler) Reconcile(ctx context.Context, req ct
 
 // RunTasks runs all the tasks associated with this reconciler.
 func (r *OpenTelemetryCollectorReconciler) RunTasks(ctx context.Context, params reconcile.Params) error {
-	r.log.Info("RunTasks RLock()", "named", params.Instance.Name)
+	r.log.Info("RunTasks RLock()", "named", params.Instance.Name, "instance", params.Instance)
 	r.muTasks.RLock()
 	r.log.Info("RunTasks RLock() acquired", "named", params.Instance.Name)
 	defer r.muTasks.RUnlock()

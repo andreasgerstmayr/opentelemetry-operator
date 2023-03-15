@@ -14,6 +14,9 @@
       date
       kubectl get event --namespace $namespace -o custom-columns=FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Object:.involvedObject.name,Type:.type,Reason:.reason,Message:.message
 
+      kubectl describe -A mutatingwebhookconfigurations.admissionregistration.k8s.io
+      kubectl describe svc -n $namespace
+
       kubectl describe -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
       kubectl describe -A deployment -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
       kubectl get -A pod
