@@ -168,15 +168,15 @@ func main() {
 	renewDeadline := time.Second * 107
 	retryPeriod := time.Second * 26
 
-	optionsTlSOptsFuncs := []func(*tls.Config){
-		func(config *tls.Config) { tlsConfigSetting(config, tlsOpt) },
-	}
+	//optionsTlSOptsFuncs := []func(*tls.Config){
+	//	func(config *tls.Config) { tlsConfigSetting(config, tlsOpt) },
+	//}
 
 	mgrOptions := ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   webhookPort,
-		TLSOpts:                optionsTlSOptsFuncs,
+		Scheme:             scheme,
+		MetricsBindAddress: metricsAddr,
+		Port:               webhookPort,
+		//TLSOpts:                optionsTlSOptsFuncs,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "9f7554c3.opentelemetry.io",
