@@ -46,7 +46,25 @@ stages:
     storage:
       spec:
         mountPath: {}
-  - image: quay.io/operator-framework/scorecard-test-kuttl:v2.0.0
+  - entrypoint:
+    - entrypoint
+    - --namespace-per-test
+    - --troubleshooting-script
+    - |
+      namespace=`kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.namespace}'`
+      pod=`kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.name}'`
+
+      kubectl logs deployment/opentelemetry-operator-controller-manager manager --namespace $namespace
+      date
+
+      kubectl describe -A mutatingwebhookconfigurations.admissionregistration.k8s.io
+      kubectl describe svc --namespace $namespace
+
+      kubectl describe -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
+      kubectl describe -A deployment -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager
+      kubectl get -A pod
+      date
+    image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678812029
     labels:
       suite: kuttlsuite
       test: kuttltest1
