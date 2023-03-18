@@ -4,7 +4,6 @@
     image: docker.io/andreasgerstmayr/scorecard-test-kuttl:1678812029
     entrypoint:
     - entrypoint
-    - --namespace-per-test
     - --troubleshooting-script
     - |
       namespace=`kubectl get -A pod -l app.kubernetes.io/name=opentelemetry-operator,control-plane=controller-manager -o jsonpath='{.items[0].metadata.namespace}'`
